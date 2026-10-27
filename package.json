@@ -1,0 +1,11 @@
+{
+  "name": "markdown-editor",
+  "version": "1.0.0",
+  "description": "A fast, private Markdown editor with live preview, its own XSS-safe parser, autosave and HTML export. Runs entirely in the browser.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test"
+  },
+  "license": "MIT"
+}

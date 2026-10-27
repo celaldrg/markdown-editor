@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob: https:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#0f172a">
+  <title>Markdown Editor</title>
+  <meta name="description" content="A fast, private Markdown editor in the browser: live preview with synchronized scrolling, autosave, several documents, a table of contents and .md / .html export.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Markdown Editor">
+  <meta property="og:description" content="A fast, private Markdown editor in the browser: live preview with synchronized scrolling, autosave, several documents, a table of contents and .md / .html export.">
+  <meta property="og:url" content="https://celaldrg.github.io/markdown-editor/">
+  <meta property="og:image" content="https://celaldrg.github.io/markdown-editor/docs/screenshot.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231e293b'/%3E%3Cpath d='M13 44V20l9.5 11L32 20v24' fill='none' stroke='%2360a5fa' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M46 20v22m-7.5-7.5L46 42l7.5-7.5' fill='none' stroke='%23e2e8f0' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+  <script type="module" src="src/main.js"></script>
+</head>
+<body>
+  <div id="app" class="app">
+    <header id="topbar" class="topbar">
+      <button id="menu-btn" class="icon-btn menu-btn" type="button" data-icon="menu" aria-controls="sidebar" aria-expanded="false" aria-label="Menu" title="Menu" data-i18n-label="menu" data-i18n-title="menu"></button>
+      <h1 class="brand">
+        <svg class="logo" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+          <rect width="64" height="64" rx="14" fill="#1e293b"/>
+          <path d="M13 44V20l9.5 11L32 20v24" fill="none" stroke="#60a5fa" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M46 20v22m-7.5-7.5L46 42l7.5-7.5" fill="none" stroke="#e2e8f0" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="brand-name" data-i18n="appTitle">Markdown Editor</span>
+      </h1>
+      <button id="doc-title" class="doc-title" type="button" data-icon="edit" title="Rename" data-i18n-title="rename"><span id="doc-title-text" class="doc-title-text"></span></button>
+      <span id="save-status" class="save-status" data-state="saved" title="Saved">
+        <span class="save-dot" aria-hidden="true"></span>
+        <span id="save-text" class="save-text">Saved</span>
+      </span>
+      <span class="spacer"></span>
+      <button id="lang-btn" class="btn lang-btn" type="button" title="Switch to Turkish" data-i18n="langToggle" data-i18n-title="langToggleLabel">TR</button>
+      <button id="reset-btn" class="btn reset-btn" type="button" data-icon="reset"><span class="label-wide" data-i18n="reset">Reset</span></button>
+    </header>
+
+    <aside id="sidebar" class="sidebar" aria-labelledby="docs-heading">
+      <div class="side-head">
+        <h2 id="docs-heading" class="side-title" data-i18n="documents">Documents</h2>
+        <button id="drawer-close" class="icon-btn drawer-close" type="button" data-icon="close" aria-label="Close" title="Close" data-i18n-label="close" data-i18n-title="close"></button>
+      </div>
+      <button id="new-doc" class="btn btn-primary btn-block" type="button" data-icon="plus"><span data-i18n="newDoc">New document</span></button>
+      <ul id="doc-list" class="doc-list"></ul>
+
+      <section class="side-section" aria-labelledby="files-heading">
+        <h2 id="files-heading" class="side-title" data-i18n="fileActions">Import and export</h2>
+        <div class="file-actions">
+          <button id="import-btn" class="btn file-btn" type="button" data-icon="upload"><span data-i18n="import">Import .md</span></button>
+          <button id="export-md" class="btn file-btn" type="button" data-icon="download"><span data-i18n="exportMd">Export .md</span></button>
+          <button id="export-html" class="btn file-btn" type="button" data-icon="html"><span data-i18n="exportHtml">Export .html</span></button>
+          <button id="copy-html" class="btn file-btn" type="button" data-icon="copy"><span data-i18n="copyHtml">Copy HTML</span></button>
+        </div>
+        <input id="import-input" class="visually-hidden" type="file" accept=".md,.markdown,.mdown,.mkd,.txt,text/markdown,text/plain" multiple tabindex="-1" aria-hidden="true">
+      </section>
+
+      <nav class="side-section toc" aria-labelledby="toc-heading">
+        <h2 id="toc-heading" class="side-title" data-i18n="toc">Contents</h2>
+        <ul id="toc-list" class="toc-list"></ul>
+        <p id="toc-empty" class="toc-empty" data-i18n="tocEmpty" hidden>Add headings to see a table of contents.</p>
+      </nav>
+    </aside>
+    <div id="backdrop" class="backdrop"></div>
+
+    <main id="workspace" class="workspace">
+      <div class="view-tabs">
+        <button id="tab-edit" class="tab" type="button" data-view="edit" aria-pressed="true" aria-controls="editor-pane" data-icon="edit"><span data-i18n="tabEdit">Edit</span></button>
+        <button id="tab-preview" class="tab" type="button" data-view="preview" aria-pressed="false" aria-controls="preview-pane" data-icon="eye"><span data-i18n="tabPreview">Preview</span></button>
+      </div>
+
+      <div id="panes" class="panes" data-view="edit">
+        <section id="editor-pane" class="pane editor-pane" aria-label="Markdown source" data-i18n-label="editorLabel">
+          <div id="toolbar" class="toolbar" role="toolbar" aria-label="Formatting" aria-controls="editor" data-i18n-label="toolbarLabel">
+            <button class="tool" type="button" data-action="bold" data-icon="bold" aria-label="Bold (Ctrl+B)" title="Bold (Ctrl+B)" data-i18n-label="bold" data-i18n-title="bold"></button>
+            <button class="tool" type="button" data-action="italic" data-icon="italic" aria-label="Italic (Ctrl+I)" title="Italic (Ctrl+I)" data-i18n-label="italic" data-i18n-title="italic"></button>
+            <button class="tool" type="button" data-action="heading" data-icon="heading" aria-label="Heading" title="Heading" data-i18n-label="heading" data-i18n-title="heading"></button>
+            <button class="tool" type="button" data-action="list" data-icon="list" aria-label="Bulleted list" title="Bulleted list" data-i18n-label="list" data-i18n-title="list"></button>
+            <button class="tool" type="button" data-action="task" data-icon="task" aria-label="Task list" title="Task list" data-i18n-label="task" data-i18n-title="task"></button>
+            <button class="tool" type="button" data-action="link" data-icon="link" aria-label="Link (Ctrl+K)" title="Link (Ctrl+K)" data-i18n-label="link" data-i18n-title="link"></button>
+            <button class="tool" type="button" data-action="code" data-icon="code" aria-label="Code" title="Code" data-i18n-label="code" data-i18n-title="code"></button>
+            <button class="tool" type="button" data-action="quote" data-icon="quote" aria-label="Quote" title="Quote" data-i18n-label="quote" data-i18n-title="quote"></button>
+            <button class="tool" type="button" data-action="table" data-icon="table" aria-label="Table" title="Table" data-i18n-label="table" data-i18n-title="table"></button>
+          </div>
+          <textarea id="editor" class="editor" spellcheck="false" autocapitalize="off" autocomplete="off" aria-describedby="editor-hint" aria-label="Markdown source" placeholder="Start writing Markdown…" data-i18n-label="editorLabel" data-i18n-placeholder="editorPlaceholder"></textarea>
+          <p id="editor-hint" class="visually-hidden" data-i18n="editorHint">Tab inserts two spaces. Press Esc, then Tab, to leave the editor.</p>
+        </section>
+
+        <div id="splitter" class="splitter" role="separator" tabindex="0" aria-orientation="vertical" aria-controls="editor-pane" aria-valuemin="20" aria-valuemax="80" aria-valuenow="50" aria-label="Resize the editor and the preview" title="Resize the editor and the preview" data-i18n-label="splitter" data-i18n-title="splitter"><span class="splitter-grip"></span></div>
+
+        <section id="preview-pane" class="pane preview-pane" aria-label="Preview" data-i18n-label="previewLabel">
+          <div class="pane-head">
+            <span class="pane-title" data-icon="eye"><span data-i18n="previewLabel">Preview</span></span>
+            <span id="stats" class="stats"></span>
+          </div>
+          <article id="preview" class="preview markdown-body" tabindex="0" aria-label="Preview" data-i18n-label="previewLabel"></article>
+        </section>
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <a class="footer-link" href="https://github.com/celaldrg/markdown-editor" target="_blank" rel="noopener noreferrer"><span data-i18n="footerLicense">MIT</span> · <span data-i18n="footerSource">Source on GitHub</span></a>
+    </footer>
+  </div>
+
+  <div id="drop-hint" class="drop-hint" hidden>
+    <p class="drop-card" data-icon="upload"><span data-i18n="dropHint">Drop a Markdown file to import it</span></p>
+  </div>
+
+  <dialog id="dialog" class="dialog" aria-labelledby="dialog-message">
+    <form id="dialog-form" class="dialog-form" method="dialog">
+      <p id="dialog-message" class="dialog-message"></p>
+      <input id="dialog-input" class="dialog-input" type="text" maxlength="120" autocomplete="off" spellcheck="false" aria-labelledby="dialog-message" hidden>
+      <div class="dialog-actions">
+        <button id="dialog-cancel" class="btn" type="button" data-i18n="cancel">Cancel</button>
+        <button id="dialog-ok" class="btn btn-primary" type="submit"></button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <div class="mirror-host" aria-hidden="true"><div id="mirror" class="mirror"></div></div>
+</body>
+</html>
