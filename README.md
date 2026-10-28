@@ -1,6 +1,6 @@
 # Markdown Editor - a fast, private Markdown editor with live preview that runs entirely in your browser
 
-[![tests: node --test](https://img.shields.io/badge/tests-node_----test-blue)](#tests)
+[![tests](https://github.com/celaldrg/markdown-editor/actions/workflows/test.yml/badge.svg)](https://github.com/celaldrg/markdown-editor/actions/workflows/test.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 **▶ Open the app: https://celaldrg.github.io/markdown-editor/**

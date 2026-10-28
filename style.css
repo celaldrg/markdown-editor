@@ -1265,6 +1265,13 @@ button {
     padding: 4px 6px;
     overflow-x: auto;
     scrollbar-width: none;
+    /* Scroll hints: an accent fade shows on an edge only while more buttons hide behind it. */
+    background:
+      linear-gradient(to right, var(--surface) 40%, rgb(30 41 59 / 0)) left / 28px 100% no-repeat local,
+      linear-gradient(to left, var(--surface) 40%, rgb(30 41 59 / 0)) right / 28px 100% no-repeat local,
+      radial-gradient(farthest-side at 0 50%, rgb(96 165 250 / 0.45), rgb(96 165 250 / 0)) left / 14px 100% no-repeat scroll,
+      radial-gradient(farthest-side at 100% 50%, rgb(96 165 250 / 0.45), rgb(96 165 250 / 0)) right / 14px 100% no-repeat scroll,
+      var(--surface);
   }
 
   .tool {
